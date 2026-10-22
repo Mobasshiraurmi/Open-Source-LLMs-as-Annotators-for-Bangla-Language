@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : BanFakeNews (fake news detection: 0 = fake, 1 = authentic)
+Prompting : Few-shot (headline)
+Model     : 1bmyllama3.2 (llama3.2:1b, temperature 0.25)
+Input     : ../Datasets/BanFakeNews.csv
+Outputs   : annotated_news1_fewshot_1B.csv
+            metrics_analysis_banfak_test_fewshot_1B.txt
+Prompt    : Dataset prompting/Banfake/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python banfake_fewshot_1B.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, \
@@ -6,7 +20,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def main():
     # Load the dataset
-    input_file = "LabeledFake-1K.csv"  # Replace with your dataset file path
+    input_file = "../Datasets/BanFakeNews.csv"  # Replace with your dataset file path
     output_file = "annotated_news1_fewshot_1B.csv"  # Output file for annotated results
     df = pd.read_csv(input_file)
 
@@ -97,14 +111,14 @@ def main():
     print('annotation done')
     # Read CSV files into dataframes
     llm_csv_path = "annotated_news1_fewshot_1B.csv"
-    human_csv_path = "LabeledFake-1K.csv"
+    human_csv_path = "../Datasets/BanFakeNews.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     # human_df=human_df.head(10)
 
     # Extract labels
     llm_labels = llm_df['Label']
-    human_labels = human_df['label']
+    human_labels = human_df['Label']
 
     # Calculate accuracy
     # Calculate metrics

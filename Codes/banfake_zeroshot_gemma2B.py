@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : BanFakeNews (fake news detection: 0 = fake, 1 = authentic)
+Prompting : Zero-shot (headline)
+Model     : mygemma2 (gemma2:2b, temperature 0.25)
+Input     : ../Datasets/BanFakeNews.csv
+Outputs   : annotated_news1_zeroshot_gemma2B.csv
+            metrics_analysis_banfak_test_zeroshot_gemma2B.txt
+Prompt    : Dataset prompting/Banfake/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python banfake_zeroshot_gemma2B.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
@@ -5,8 +19,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def main():
     # Load the dataset
-    input_file = "LabeledFake-1K.csv"  # Replace with your dataset file path
-    output_file = "annotated_news1_zeroshot_1B.csv"  # Output file for annotated results
+    input_file = "../Datasets/BanFakeNews.csv"  # Replace with your dataset file path
+    output_file = "annotated_news1_zeroshot_gemma2B.csv"  # Output file for annotated results
     df = pd.read_csv(input_file)
 
     # Use only the first 10 rows
@@ -60,7 +74,7 @@ def main():
 
             # Send the conversation to the model
             try:
-                response = ol.chat(model='1bmyllama3.2', messages=messages_to_send)
+                response = ol.chat(model='mygemma2', messages=messages_to_send)
 
                 # Get the model's response
                 output = response['message']['content'].strip()
@@ -88,15 +102,15 @@ def main():
                 output_csv.write(f'"{article_id}",-1\n')
     print('annotation done')
         # Read CSV files into dataframes
-    llm_csv_path = "annotated_news1_zeroshot_1B.csv"
-    human_csv_path = "LabeledFake-1K.csv"
+    llm_csv_path = "annotated_news1_zeroshot_gemma2B.csv"
+    human_csv_path = "../Datasets/BanFakeNews.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     #human_df=human_df.head(10)
 
     # Extract labels
     llm_labels = llm_df['Label']
-    human_labels = human_df['label']
+    human_labels = human_df['Label']
 
     # Calculate accuracy
     # Calculate metrics
@@ -116,7 +130,7 @@ def main():
     print(report)
 
     #save to result file
-    output_path = "metrics_analysis_banfak_test_zeroshot_1B.txt"
+    output_path = "metrics_analysis_banfak_test_zeroshot_gemma2B.txt"
     with open(output_path, "w") as result_file:
         result_file.write(f"Metrics Analysis:\n")
         result_file.write(f"Accuracy: {accuracy:.2f}\n")

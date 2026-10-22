@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : RevBangla (product review sentiment: positive / negative)
+Prompting : Chain-of-thought
+Model     : mygemma2 (gemma2:2b, temperature 0.25)
+Input     : ../Datasets/RevBangla.csv
+Outputs   : annotated_data_cot_gemma2B.csv
+            metrics_analysis_Revbangla_test_COT_gemma2B.txt
+Prompt    : Dataset prompting/RevBangla/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python Revbangla_COT_gemma2b.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
@@ -5,8 +19,8 @@ import time
 
 def main():
     start_time = time.time()
-    Load the dataset
-    input_file = "data.csv"  # Replace with your dataset file path
+    # Load the dataset
+    input_file = "../Datasets/RevBangla.csv"  # Replace with your dataset file path
     output_file = "annotated_data_cot_gemma2B.csv"  # Output file for annotated results
     df = pd.read_csv(input_file)
 
@@ -44,6 +58,7 @@ def main():
         for _, row in df.iterrows():
             # Extract relevant data for annotation
             comment = row['comment']
+            comment_csv = comment.replace('"', '""')  # escape quotes for CSV output
             # Create the input message for the model
 
             # Append the user input to the conversation
@@ -70,7 +85,7 @@ def main():
                 if sentiment not in ["positive", "negative"]:
                     sentiment = "unknown"
 
-                output_csv.write(f'"{comment}","{sentiment}"\n')
+                output_csv.write(f'"{comment_csv}","{sentiment}"\n')
 
                 # Optional: Print progress
 
@@ -79,11 +94,11 @@ def main():
             except Exception as e:
                 print(f"Error processing Article ID: {comment} - {e}")
 
-                output_csv.write(f'"{comment}",-1\n')
+                output_csv.write(f'"{comment_csv}",-1\n')
     print('annotation done')
         # Read CSV files into dataframes
     llm_csv_path = "annotated_data_cot_gemma2B.csv"
-    human_csv_path = "data.csv"
+    human_csv_path = "../Datasets/RevBangla.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     #human_df=human_df.head(100)
@@ -123,20 +138,20 @@ def main():
     print(report)
     #
     # #save to result file
-    # output_path = "metrics_analysis_Revbangla_test_COT_gemma2B.txt"
-    # with open(output_path, "w") as result_file:
-    #     result_file.write(f"Metrics Analysis:\n")
-    #     result_file.write(f"Accuracy: {accuracy:.2f}\n")
-    #     result_file.write(f"Precision: {precision:.2f}\n")
-    #     result_file.write(f"Recall: {recall:.2f}\n")
-    #     result_file.write(f"F1 Score: {f1:.2f}\n")
-    #     result_file.write("\nConfusion Matrix:\n")
-    #     result_file.write(f"{conf_matrix}\n")
-    #     result_file.write("\nClassification Report:\n")
-    #     result_file.write(f"{report}\n")
-    #     end_time = time.time()
-    #     execution_time = end_time - start_time
-    #     result_file.write(f"Execution time:{execution_time} seconds\n")
-    #     print("Execution time:", execution_time, "seconds")
+    output_path = "metrics_analysis_Revbangla_test_COT_gemma2B.txt"
+    with open(output_path, "w") as result_file:
+        result_file.write(f"Metrics Analysis:\n")
+        result_file.write(f"Accuracy: {accuracy:.2f}\n")
+        result_file.write(f"Precision: {precision:.2f}\n")
+        result_file.write(f"Recall: {recall:.2f}\n")
+        result_file.write(f"F1 Score: {f1:.2f}\n")
+        result_file.write("\nConfusion Matrix:\n")
+        result_file.write(f"{conf_matrix}\n")
+        result_file.write("\nClassification Report:\n")
+        result_file.write(f"{report}\n")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        result_file.write(f"Execution time:{execution_time} seconds\n")
+        print("Execution time:", execution_time, "seconds")
 if __name__ == "__main__":
     main()

@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : BanFakeNews (fake news detection: 0 = fake, 1 = authentic)
+Prompting : Chain-of-thought (article body, first 1000 chars)
+Model     : tmp3myllama3.2 (llama3.2:3b, temperature 0.25)
+Input     : ../Datasets/BanFakeNews.csv
+Outputs   : annotated_news1.csv
+            metrics_analysis_banfak_test_COT.txt
+Prompt    : Dataset prompting/Banfake/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python banfakenews_COT_3B.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
@@ -5,7 +19,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def main():
     #Load the dataset
-    input_file = "LabeledFake-1K.csv"  # Replace with your dataset file path
+    input_file = "../Datasets/BanFakeNews.csv"  # Replace with your dataset file path
     output_file = "annotated_news1.csv"  # Output file for annotated results
     df = pd.read_csv(input_file)
 
@@ -13,7 +27,7 @@ def main():
     #df = df.head(10)  # Take the first 10 rows of the dataset
 
     # Ground truth labels
-    ground_truth = df['label'].tolist()
+    ground_truth = df['Label'].tolist()
     predictions = []
 
     # Define the initial instructions for the      model
@@ -57,7 +71,7 @@ def main():
             # date = row['date']
             # category = row['category']
             headline = row['headline']
-            content = row['content']
+            content = row['Data']
 
             # Create the input message for the model
             user_message = f"""{content[:1000]}  # Only the first 1000 characters if content is too long
@@ -81,6 +95,8 @@ def main():
 
 
                 Label = output.split("Label:")[1].split("Reason:")[0].strip()
+                if Label not in ["0", "1"]:
+                    Label = "-1"
                 reason = output.split("Reason:")[1].strip()
                     # Append the decision to predictions list
                 #predictions.append(Label)
@@ -100,14 +116,14 @@ def main():
     print('annotation done')
         # Read CSV files into dataframes
     llm_csv_path = "annotated_news1.csv"
-    human_csv_path = "LabeledFake-1K.csv"
+    human_csv_path = "../Datasets/BanFakeNews.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     #human_df=human_df.head(10)
 
     # Extract labels
     llm_labels = llm_df['Label']
-    human_labels = human_df['label']
+    human_labels = human_df['Label']
 
     # Calculate accuracy
     # Calculate metrics

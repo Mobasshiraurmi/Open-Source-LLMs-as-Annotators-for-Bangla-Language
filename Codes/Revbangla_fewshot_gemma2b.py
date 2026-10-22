@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : RevBangla (product review sentiment: positive / negative)
+Prompting : Few-shot
+Model     : mygemma2 (gemma2:2b, temperature 0.25)
+Input     : ../Datasets/RevBangla.csv
+Outputs   : annotated_data_fewshot_gemma2b.csv
+            metrics_analysis_Revbangla_test_fewshot_gemma2b.txt
+Prompt    : Dataset prompting/RevBangla/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python Revbangla_fewshot_gemma2b.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
@@ -6,92 +20,93 @@ import time
 def main():
     # Load the dataset
     start_time = time.time()
-    # input_file = "data.csv"  # Replace with your dataset file path
-    # output_file = "annotated_data_fewshot_gemma2b.csv"  # Output file for annotated results
-    # df = pd.read_csv(input_file)
-    #
-    # # Use only the first 10 rows
-    # #df = df.head(400)  # Take the first 10 rows of the dataset
-    #
-    # # Define the initial instructions for the model
-    # messages = [
-    #     {
-    #         'role': 'system',
-    #         'content': """You are an expert in  sentiment analysis in Bangla. You must Classify the sentiment of the following product reviews into one of the two categories only, not any other explanation :
-    #
-    #         - positive: Positive sentiment
-    #         - negative: Negative sentiment
-    #
-    #     For each product review comment, respond with only the corresponding label ("positive" or "negative").
-    #     **Important** : Do not provide any other explanations or additional text. Only respond with positive or negative
-    #     Example Inputs:
-    #     comment: "চমৎকার একটি প্রোডাক্ট"
-    #     sentiment:positive
-    #
-    #     comment: "বেল্ট আরও মোটা হওয়া উচিত ছিল কোয়ালিটি মোটামুটি দাম কমালে ভালো হবে"
-    #     sentiment:negative
-    #
-    #     comment: "খুব বাজে দামটাও অনেক বেশি"
-    #     sentiment:negative
-    #
-    #
-    #     """,
-    #
-    #     }
-    #
-    # ]
-    #
-    # # Set the maximum number of messages to include to stay within the model's context window
-    # max_history_length = 1500  # Adjust based on the model's capabilities
-    #
-    # # Open the output file to save results
-    # with open(output_file, "w") as output_csv:
-    #     output_csv.write("comment,sentiment\n")  # Write CSV header
-    #
-    #     # Iterate over each row in the dataset (limited to 10 rows)
-    #     for _, row in df.iterrows():
-    #         # Extract relevant data for annotation
-    #         comment = row['comment']
-    #         # Create the input message for the model
-    #
-    #         # Append the user input to the conversation
-    #         messages.append({'role': 'user', 'content': f'Input: {comment}'})
-    #
-    #         # Build the messages to send, keeping the last N messages within the max history length
-    #         messages_to_send = [messages[0]] + messages[-(max_history_length - 1):]
-    #
-    #         # Send the conversation to the model
-    #         try:
-    #             response = ol.chat(model='mygemma2', messages=messages_to_send)
-    #
-    #             # Get the model's response
-    #             output = response['message']['content'].strip()
-    #
-    #             # Append the assistant's response to the conversation
-    #             messages.append({'role': 'assistant', 'content': output})
-    #
-    #             # Extract the bucket ID number from the model's response
-    #
-    #             sentiment = output.replace("sentiment: ", "").strip()
-    #             #print(type(label))
-    #             # Write the results to the output CSV file
-    #             if sentiment not in ["positive", "negative"]:
-    #                 sentiment = "unknown"
-    #
-    #             output_csv.write(f'"{comment}","{sentiment}"\n')
-    #
-    #             # Optional: Print progress
-    #
-    #             print(f">>> {comment}\n{sentiment}\n")
-    #
-    #         except Exception as e:
-    #             print(f"Error processing Article ID: {comment} - {e}")
-    #
-    #             output_csv.write(f'"{comment}",-1\n')
+    input_file = "../Datasets/RevBangla.csv"  # Replace with your dataset file path
+    output_file = "annotated_data_fewshot_gemma2b.csv"  # Output file for annotated results
+    df = pd.read_csv(input_file)
+
+    # Use only the first 10 rows
+    #df = df.head(400)  # Take the first 10 rows of the dataset
+
+    # Define the initial instructions for the model
+    messages = [
+        {
+            'role': 'system',
+            'content': """You are an expert in  sentiment analysis in Bangla. You must Classify the sentiment of the following product reviews into one of the two categories only, not any other explanation :
+
+            - positive: Positive sentiment
+            - negative: Negative sentiment
+
+        For each product review comment, respond with only the corresponding label ("positive" or "negative").
+        **Important** : Do not provide any other explanations or additional text. Only respond with positive or negative
+        Example Inputs:
+        comment: "চমৎকার একটি প্রোডাক্ট"
+        sentiment:positive
+
+        comment: "বেল্ট আরও মোটা হওয়া উচিত ছিল কোয়ালিটি মোটামুটি দাম কমালে ভালো হবে"
+        sentiment:negative
+
+        comment: "খুব বাজে দামটাও অনেক বেশি"
+        sentiment:negative
+
+
+        """,
+
+        }
+
+    ]
+
+    # Set the maximum number of messages to include to stay within the model's context window
+    max_history_length = 1500  # Adjust based on the model's capabilities
+
+    # Open the output file to save results
+    with open(output_file, "w") as output_csv:
+        output_csv.write("comment,sentiment\n")  # Write CSV header
+
+        # Iterate over each row in the dataset (limited to 10 rows)
+        for _, row in df.iterrows():
+            # Extract relevant data for annotation
+            comment = row['comment']
+            comment_csv = comment.replace('"', '""')  # escape quotes for CSV output
+            # Create the input message for the model
+
+            # Append the user input to the conversation
+            messages.append({'role': 'user', 'content': f'Input: {comment}'})
+
+            # Build the messages to send, keeping the last N messages within the max history length
+            messages_to_send = [messages[0]] + messages[-(max_history_length - 1):]
+
+            # Send the conversation to the model
+            try:
+                response = ol.chat(model='mygemma2', messages=messages_to_send)
+
+                # Get the model's response
+                output = response['message']['content'].strip()
+
+                # Append the assistant's response to the conversation
+                messages.append({'role': 'assistant', 'content': output})
+
+                # Extract the bucket ID number from the model's response
+
+                sentiment = output.replace("sentiment: ", "").strip()
+                #print(type(label))
+                # Write the results to the output CSV file
+                if sentiment not in ["positive", "negative"]:
+                    sentiment = "unknown"
+
+                output_csv.write(f'"{comment_csv}","{sentiment}"\n')
+
+                # Optional: Print progress
+
+                print(f">>> {comment}\n{sentiment}\n")
+
+            except Exception as e:
+                print(f"Error processing Article ID: {comment} - {e}")
+
+                output_csv.write(f'"{comment_csv}",-1\n')
     print('annotation done')
         # Read CSV files into dataframes
     llm_csv_path = "annotated_data_fewshot_gemma2b.csv"
-    human_csv_path = "data.csv"
+    human_csv_path = "../Datasets/RevBangla.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     #human_df=human_df.head(400)

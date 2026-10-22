@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : RevBangla (product review sentiment: positive / negative)
+Prompting : Chain-of-thought
+Model     : 1bmyllama3.2 (llama3.2:1b, temperature 0.25)
+Input     : ../Datasets/RevBangla.csv
+Outputs   : annotated_data_cot_1B.csv
+            metrics_analysis_Revbangla_test_COT_1B.txt
+Prompt    : Dataset prompting/RevBangla/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python Revbangla_COT_1B.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
@@ -5,7 +19,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def main():
     # Load the dataset
-    input_file = "data.csv"  # Replace with your dataset file path
+    input_file = "../Datasets/RevBangla.csv"  # Replace with your dataset file path
     output_file = "annotated_data_cot_1B.csv"  # Output file for annotated results
     df = pd.read_csv(input_file)
 
@@ -43,6 +57,7 @@ def main():
         for _, row in df.iterrows():
             # Extract relevant data for annotation
             comment = row['comment']
+            comment_csv = comment.replace('"', '""')  # escape quotes for CSV output
             # Create the input message for the model
 
             # Append the user input to the conversation
@@ -69,7 +84,7 @@ def main():
                 if sentiment not in ["positive", "negative"]:
                     sentiment = "negative"
 
-                output_csv.write(f'"{comment}","{sentiment}"\n')
+                output_csv.write(f'"{comment_csv}","{sentiment}"\n')
 
                 # Optional: Print progress
 
@@ -78,11 +93,11 @@ def main():
             except Exception as e:
                 print(f"Error processing Article ID: {comment} - {e}")
 
-                output_csv.write(f'"{comment}",-1\n')
+                output_csv.write(f'"{comment_csv}",-1\n')
     print('annotation done')
         # Read CSV files into dataframes
     llm_csv_path = "annotated_data_cot_1B.csv"
-    human_csv_path = "data.csv"
+    human_csv_path = "../Datasets/RevBangla.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     #human_df=human_df.head(100)

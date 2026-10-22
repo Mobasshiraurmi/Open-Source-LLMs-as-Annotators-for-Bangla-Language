@@ -1,3 +1,17 @@
+"""
+Part 1 (Python scripts) - see README.md, "Part 1: RevBangla and BanFakeNews".
+
+Dataset   : BanFakeNews (fake news detection: 0 = fake, 1 = authentic)
+Prompting : Zero-shot (headline)
+Model     : tmp3myllama3.2 (llama3.2:3b, temperature 0.25)
+Input     : ../Datasets/BanFakeNews.csv
+Outputs   : annotated_news1_zeroshot.csv
+            metrics_analysis_banfak_test_zeroshot.txt
+Prompt    : Dataset prompting/Banfake/
+
+How to run (from the Codes/ folder, with Ollama running):
+    python banfake_zeroshot_old.py
+"""
 import ollama as ol
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
@@ -5,7 +19,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def main():
     # Load the dataset
-    input_file = "LabeledFake-1K.csv"  # Replace with your dataset file path
+    input_file = "../Datasets/BanFakeNews.csv"  # Replace with your dataset file path
     output_file = "annotated_news1_zeroshot.csv"  # Output file for annotated results
     df = pd.read_csv(input_file)
 
@@ -50,6 +64,8 @@ def main():
             # headline = row['headline']
             # content = row['content']
 
+            line_csv = line.replace('"', '""')  # escape quotes for CSV output
+
             # Create the input message for the model
 
             # Append the user input to the conversation
@@ -71,32 +87,33 @@ def main():
                 # Extract the bucket ID number from the model's response
 
                 label = output.replace("Label: ", "").strip()
+                if label not in ["0", "1"]:
+                    label = "-1"
                 # Append the decision to predictions list
                 #predictions.append(Label)
 
                 # Write the results to the output CSV file
 
-                output_csv.write(f'"{line}","{label}"\n')
+                output_csv.write(f'"{line_csv}","{label}"\n')
 
                 # Optional: Print progress
 
                 print(f">>> {line}\n{label}\n")
 
             except Exception as e:
-                print(f"Error processing Article ID: {article_id} - {e}")
-                predictions.append(-1)  # Append -1 for errors
-                output_csv.write(f'"{article_id}",-1\n')
+                print(f"Error processing headline: {line} - {e}")
+                output_csv.write(f'"{line_csv}",-1\n')
     print('annotation done')
         # Read CSV files into dataframes
     llm_csv_path = "annotated_news1_zeroshot.csv"
-    human_csv_path = "LabeledFake-1K.csv"
+    human_csv_path = "../Datasets/BanFakeNews.csv"
     llm_df = pd.read_csv(llm_csv_path)
     human_df = pd.read_csv(human_csv_path)
     #human_df=human_df.head(10)
 
     # Extract labels
     llm_labels = llm_df['Label']
-    human_labels = human_df['label']
+    human_labels = human_df['Label']
 
     # Calculate accuracy
     # Calculate metrics
