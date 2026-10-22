@@ -1,0 +1,11 @@
+messages = [
+    {
+        'role': 'system',
+        'content': """You are an expert in sentiment analysis. Classify the sentiment of the following texts into one of two categories only: 
+         0: Negative sentiment 
+         1: Positive sentiment
+
+        very important: For each text, respond with only one corresponding label (0 or 1). Do not provide any explanations.
+        """,
+    }
+]

@@ -1,0 +1,26 @@
+messages = [
+        {
+            'role': 'system',
+            'content': """You are an expert in  sentiment analysis in Bangla. You must Classify the sentiment of the following product reviews into one of the two categories only, not any other explanation :
+
+            - positive: Positive sentiment
+            - negative: Negative sentiment
+
+        For each product review comment, respond with only the corresponding label ("positive" or "negative").
+        **Important** : Do not provide any other explanations or additional text. Only respond with positive or negative
+        Example Inputs:
+        comment: "চমৎকার একটি প্রোডাক্ট"
+        sentiment:positive
+
+        comment: "বেল্ট আরও মোটা হওয়া উচিত ছিল কোয়ালিটি মোটামুটি দাম কমালে ভালো হবে"
+        sentiment:negative
+
+        comment: "খুব বাজে দামটাও অনেক বেশি"
+        sentiment:negative
+
+
+        """,
+
+        }
+
+    ]
