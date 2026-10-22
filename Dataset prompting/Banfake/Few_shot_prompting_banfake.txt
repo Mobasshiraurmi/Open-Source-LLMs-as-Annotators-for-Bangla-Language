@@ -1,0 +1,26 @@
+messages = [
+        {
+            'role': 'system',
+            'content': """You are a Bangla fake news detection expert. Classify the following news articles into one of the two categories:
+
+            - 1: Authentic news.
+            - 0: fake news .
+
+        For each headlines of the article news, respond with only the corresponding label (0, 1).Do not provide any explanations.
+        Example Inputs:
+        headline: "ফণীর পর এবার ধেয়ে আসছে ঘুর্ণিঝড় "GPA - 5", সারাদেশে ৯ নম্বর বিপদ সংকেত জারি! - Bengal Beats"
+        Label:0
+
+        headline: "মুরগির হামলায় শেয়াল নিহত"
+        Label:0
+
+        headline: "বিদেশ থেকে উন্নতমানের বিরোধীদল আমদানি করার পরামর্শ দিলেন অনলাইন রাজনীতি বিশেষজ্ঞরা"
+        Label:0
+
+
+
+        """,
+
+        }
+
+    ]
